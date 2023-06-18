@@ -25,14 +25,32 @@ public class GoalPlannerController {
 	@Autowired
 	private GoalService goalService;
 
-	@GetMapping("/${userId}") 
-	public ResponseEntity<List<GoalDto>> getAllGoals(@PathVariable long userId) {
-		List<GoalDto> goals = goalService.findAllGoalsById(userId);
-		return new ResponseEntity<>(goals, HttpStatus.FOUND);
+	@GetMapping("/{userId}") 
+	public ResponseEntity<List<GoalDto>> getAllGoalsByUserId(@PathVariable long userId) {
+		try {
+			List<GoalDto> goals = goalService.findAllGoalsByUserId(userId);
+			
+			if (goals.isEmpty() ) {
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+			
+			return new ResponseEntity<>(goals, HttpStatus.FOUND);
+			
+		} catch(Exception e){
+			System.err.println(e.getMessage());
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
 	};
 	
+	/**
+	 * 
+	 * @param userId The id of the goal's user
+	 * @param goalData The data to create a new goal
+	 * @return The data of the newly created goal
+	 */
 	@PostMapping
-	public ResponseEntity<GoalDto> createGoal(@RequestBody GoalDto goalData) {
+	public ResponseEntity<GoalDto> createGoalByUserId(@RequestBody GoalDto goalData) {
 		GoalDto goal = goalService.createGoal(goalData);
 		return new ResponseEntity<>(goal, HttpStatus.CREATED);
 	}

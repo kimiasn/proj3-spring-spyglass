@@ -7,17 +7,23 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.skillstorm.demo.dtos.UserDto;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 
 @Entity
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "users")
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private long id;
 
     private String name;
 
@@ -26,8 +32,9 @@ public class User {
 
     private String password;
  
-
-
-
+    
+    public UserDto toDto() {
+    	return new UserDto(id, name, email);
+    }
 	
 }
