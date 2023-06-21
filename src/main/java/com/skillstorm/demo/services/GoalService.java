@@ -35,6 +35,10 @@ public class GoalService {
 				.toList();
 	}
 	
+	public Goal findGoalByGoalId(long goalId) {
+		Goal goal = goalRepository.findById(goalId).orElseThrow();
+		return goal;
+	}
 	/**
 	 * 
 	 * @param goalData The data to create a goal entity with 
@@ -43,11 +47,7 @@ public class GoalService {
 	public GoalDto createGoal(GoalDto goalData) {
 		User user = userRepository.findById(goalData.getUserId())
 				.orElseThrow();
-//		Goal goal = new Goal(goalData.getTitle(), 
-//				goalData.getStartDate(), goalData.getTargetDate(),
-//				goalData.getStartAmount(), goalData.getTargetAmount(), 
-//				goalData.getCurrentAmount(), goalData.getDescription(),
-//				goalData.getCategory(), goalData.getPhotoURL(), user);
+		
 		Goal goal = Goal.builder().category(goalData.getCategory())
 				.title(goalData.getTitle())
 				.startDate(goalData.getStartDate())
@@ -64,5 +64,34 @@ public class GoalService {
 
 		return goalRepository.save(goal).toDto();
 
+	}
+	
+	/**
+	 * 
+	 * @param goalData The data to update a goal with
+	 * @return the data of the updated goal
+	 */
+	public GoalDto updateGoal(GoalDto goalData) {
+		User user = userRepository.findById(goalData.getUserId())
+				.orElseThrow();
+		
+		Goal goal = findGoalByGoalId(goalData.getId());
+		goal.setCategory(goalData.getCategory());
+		goal.setCurrentAmount(goalData.getCurrentAmount());
+		goal.setDescription(goalData.getDescription());
+		goal.setPhotoURL(goalData.getPhotoURL());
+		goal.setStartAmount(goalData.getStartAmount());
+		goal.setStartDate(goalData.getStartDate());
+		goal.setTargetAmount(goalData.getTargetAmount());
+		goal.setTargetDate(goalData.getTargetDate());
+		goal.setTitle(goalData.getTitle());
+		goal.setUser(user);
+
+		return goalRepository.save(goal).toDto();
+
+	}
+	
+	public void deleteGoal(Goal goal) {
+		goalRepository.delete(goal);
 	}
 }
