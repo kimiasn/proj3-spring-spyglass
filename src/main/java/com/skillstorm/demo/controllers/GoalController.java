@@ -1,7 +1,7 @@
 package com.skillstorm.demo.controllers;
 
 import java.util.List;
-import java.util.Map;
+//import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,41 +20,41 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.skillstorm.demo.dtos.GoalDto;
-import com.skillstorm.demo.dtos.UserDto;
 import com.skillstorm.demo.models.Goal;
-//import com.skillstorm.demo.models.User;
 import com.skillstorm.demo.services.GoalService;
-import com.skillstorm.demo.services.UserService;
+//import com.skillstorm.demo.services.UserService;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/goals")
 @CrossOrigin(allowCredentials = "true", originPatterns = "http://localhost:5173")
 public class GoalController {
 
 	@Autowired
 	private GoalService goalService;
 
-	@Autowired
-	private UserService userService;
+//	@Autowired
+//	private UserService userService;
 
-	@GetMapping("{userId}")
-	public Map<String, Object> getAllGoalsByUserId(@AuthenticationPrincipal OAuth2User oAuthUser) {
-		Map<String, Object> user =  oAuthUser.getAttributes();
-		System.out.println("user sub/id: " + user.get("sub"));
-		return user;
-//		try {
-//			List<GoalDto> goals = goalService.findAllGoalsByUserId(userId);
-//
-//			if (goals.isEmpty()) {
-//				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//			}
-//
-//			return new ResponseEntity<>(goals, HttpStatus.FOUND);
-//
-//		} catch (Exception e) {
-//			System.err.println(e.getMessage());
-//			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-//		}
+	@GetMapping()
+//	public Map<String, Object> getAllGoalsByUserId(@AuthenticationPrincipal OAuth2User oAuthUser) {
+//		Map<String, Object> user =  oAuthUser.getAttributes();
+//		System.out.println("user sub/id: " + user.get("sub"));
+//		return user;
+	public ResponseEntity<List<GoalDto>> getAllGoalsByUserId(@AuthenticationPrincipal OAuth2User user) {
+		
+		try {
+			List<GoalDto> goals = goalService.findAllGoalsByUserId((String) user.getAttributes().get("sub"));
+
+			if (goals.isEmpty()) {
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+
+			return new ResponseEntity<>(goals, HttpStatus.FOUND);
+
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 
 	};
 	
@@ -106,13 +106,8 @@ public class GoalController {
 	 */
 	@PostMapping("{userId}")
 	public ResponseEntity<GoalDto> createGoalByUserId(@RequestBody GoalDto goalData) {
-		System.out.println("user id: " + goalData.getUserId());
+
 		try {
-			UserDto userDto = userService.findUserById(goalData.getUserId());
-			System.out.println("user does not exist");
-			if (userDto == null) {
-				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-			}
 
 			GoalDto goalDto = goalService.createGoal(goalData);
 			return new ResponseEntity<>(goalDto, HttpStatus.CREATED);

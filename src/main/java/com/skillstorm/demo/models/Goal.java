@@ -11,6 +11,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import com.skillstorm.demo.dtos.GoalDto;
 
@@ -31,6 +32,8 @@ public class Goal {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 	
+	@NotNull
+	private String userId;
 	@NotBlank(message = "A Title is required")
 	private String title;
 	private Date startDate;
@@ -42,11 +45,9 @@ public class Goal {
 	private String category;
 	private String photoURL;
 	
-	@JoinColumn(name = "user_id")
-	@ManyToOne
-	private User user;
-	
-	
+//	@JoinColumn(name = "user_id")
+//	@ManyToOne
+//	private User user;
 	
 	
 	/**
@@ -54,48 +55,8 @@ public class Goal {
 	 * @return The DTO
 	 */
 	public GoalDto toDto() {
-		return new GoalDto(id, user.getId(), title, startDate, targetDate, startAmount,
+		return new GoalDto(id, userId, title, startDate, targetDate, startAmount,
 				targetAmount, currentAmount, description, category, photoURL);
 	}
-
-
-
-//
-//	public Goal(long id, @NotBlank(message = "A Title is required") String title, Date startDate, Date targetDate,
-//			BigDecimal startAmount, BigDecimal targetAmount, BigDecimal currentAmount, String description,
-//			String category, String photoURL, User user) {
-//		super();
-//		this.id = id;
-//		this.title = title;
-//		this.startDate = startDate;
-//		this.targetDate = targetDate;
-//		this.startAmount = startAmount;
-//		this.targetAmount = targetAmount;
-//		this.currentAmount = currentAmount;
-//		this.description = description;
-//		this.category = category;
-//		this.photoURL = photoURL;
-//		this.user = user;
-//	}
-
-
-
-
-//	public Goal(long id2, String title2, Date startDate2, Date targetDate2, BigDecimal startAmount2,
-//			BigDecimal targetAmount2, BigDecimal currentAmount2, String description2, String category2,
-//			String photoURL2, User user2) {
-//		super();
-//		this.id = id2;
-//		this.title = title2;
-//		this.startDate = startDate2;
-//		this.targetDate = targetDate2;
-//		this.startAmount = startAmount2;
-//		this.targetAmount = targetAmount2;
-//		this.currentAmount = currentAmount2;
-//		this.description = description2;
-//		this.category = category2;
-//		this.photoURL = photoURL2;
-//		this.user = user2;
-//	}
 	
 }

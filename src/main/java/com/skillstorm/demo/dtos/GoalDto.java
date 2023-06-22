@@ -11,7 +11,7 @@ import lombok.Data;
 public class GoalDto {
 	
 	private long id;
-	private long userId;
+	private String userId;
 	private String title;
 	private Date startDate;
 	private Date targetDate;

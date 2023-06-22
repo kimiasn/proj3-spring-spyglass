@@ -14,8 +14,8 @@ import com.skillstorm.demo.models.Goal;
 @Repository
 public interface GoalRepository extends JpaRepository<Goal, Long>  {
 	
-	@Query("select g from Goal g where g.user.id = ?1")
-	public List<Goal> findAllGoalsByUserId(long id);
+	@Query("select g from Goal g where g.userId = ?1")
+	public List<Goal> findAllGoalsByUserId(String id);
 	
 	Page<Goal> findByCategory(String category, Pageable pagable);
 	
