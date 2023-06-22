@@ -1,94 +1,66 @@
 package com.skillstorm.demo.controllers;
 
-import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.view.RedirectView;
 
-//import com.skillstorm.demo.dtos.GoalDto;
-import com.skillstorm.demo.dtos.UserDto;
-import com.skillstorm.demo.models.User;
-import com.skillstorm.demo.services.UserService;
-
-@RestController
-@RequestMapping("/users")
-@CrossOrigin
+@Controller
+//            allows cookies to send,
+@CrossOrigin(allowCredentials = "true", originPatterns = "http://localhost:5173")
 public class UserController {
 
 	@Autowired
-	private UserService userService;
+	private OAuth2AuthorizedClientService clientService;
 	
-	@GetMapping
-	public ResponseEntity<List<UserDto>> findAllUsers(){
-		return new ResponseEntity<>(userService.findAllUsers(), HttpStatus.OK);
+	// Redirects the user to the frontend application (S3 bucket, localhost:5173)
+	// Users should ONLY access the app using this
+	// This is done to get the JSESSIONID cookie established (login with Google)
+	@GetMapping("/signin")
+	public RedirectView redirectView() {
+		RedirectView redirectView = new RedirectView("http://localhost:5173");
+		return redirectView;
 	}
 	
-	// ?? how to protect this so users can not access
-	/**
-	 * 
-	 * @param id The id of the user
-	 * @return The data of the user
-	 */
-	@GetMapping("/{id}") 
-	public ResponseEntity<UserDto> findUserById(@PathVariable long id){
-		UserDto userDto = userService.findUserById(id);
-		if (userDto == null) {
-			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-		} else {
-			return new ResponseEntity<>(userDto, HttpStatus.OK);
-		}
-	}
-	
-	@PostMapping("/signup")
-	public ResponseEntity<UserDto> createUser(@RequestBody User userData) {
-		try {
-		UserDto userDto = userService.findUserById(userData.getId());
-			if (userDto != null) {
-				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-			}
-		} catch (Exception e){
-			System.out.println(e);
-			
-		}
-		UserDto user = userService.createUser(userData);
-		return new ResponseEntity<>(user, HttpStatus.CREATED);
-	}
-	
-	@PutMapping("/{id}")
-	public ResponseEntity<UserDto> updateUser(@PathVariable long id, @RequestBody User userData) {
-		UserDto userDto = userService.findUserById(userData.getId());
-		if (userDto == null) {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
-		UserDto user = userService.updateUser(userData);
-		return new ResponseEntity<>(user, HttpStatus.OK);
-	}
-	
-	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> deleteUser(@PathVariable long id) {
-		try {
-			UserDto userDto = userService.findUserById(id);
-			
-			if (userDto == null) {
-				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-			}
-			userService.deleteUser(id);
-			return new ResponseEntity<>(HttpStatus.OK);
-		} catch(Exception e) {
-			System.err.println(e.getMessage());
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-		}
 
+	@GetMapping("/userinfo")
+	@ResponseBody // Send the data as JSON
+	public Map<String, Object> userInfo(@AuthenticationPrincipal OAuth2User oAuthuser) {
+		
+		// Info about the user
+		Map<String, Object> user = oAuthuser.getAttributes();
+		System.out.println(user.get("sub"));
+		return user;
+	}
+
+	// Return access token
+	@GetMapping("/access")
+	@ResponseBody
+	public String accessToken(Authentication auth) {
+		if (auth instanceof OAuth2AuthenticationToken) {
+			OAuth2AuthenticationToken authToken = (OAuth2AuthenticationToken) auth;
+			OAuth2AuthorizedClient client = clientService
+					.loadAuthorizedClient(authToken.getAuthorizedClientRegistrationId(), authToken.getName());
+			return client.getAccessToken().getTokenValue();
+		}
+		return "";
+	}
+
+	// Return id token
+	@GetMapping("/id")
+	@ResponseBody
+	public String idToken(@AuthenticationPrincipal OAuth2User user) {
+		return ((DefaultOidcUser) user).getIdToken().getTokenValue();
 	}
 }
-

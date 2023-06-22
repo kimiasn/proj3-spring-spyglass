@@ -1,10 +1,13 @@
 package com.skillstorm.demo.controllers;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,13 +22,13 @@ import org.springframework.web.bind.annotation.RestController;
 import com.skillstorm.demo.dtos.GoalDto;
 import com.skillstorm.demo.dtos.UserDto;
 import com.skillstorm.demo.models.Goal;
-import com.skillstorm.demo.models.User;
+//import com.skillstorm.demo.models.User;
 import com.skillstorm.demo.services.GoalService;
 import com.skillstorm.demo.services.UserService;
 
 @RestController
-@RequestMapping("/goals")
-@CrossOrigin
+@RequestMapping("/users")
+@CrossOrigin(allowCredentials = "true", originPatterns = "http://localhost:5173")
 public class GoalController {
 
 	@Autowired
@@ -34,38 +37,38 @@ public class GoalController {
 	@Autowired
 	private UserService userService;
 
-	/**
-	 * 
-	 * @param userId The id of user
-	 * @return A list of all goals for a user id
-	 */
-	@GetMapping("/user/{userId}")
-	public ResponseEntity<List<GoalDto>> getAllGoalsByUserId(@PathVariable long userId) {
-		try {
-			List<GoalDto> goals = goalService.findAllGoalsByUserId(userId);
-
-			if (goals.isEmpty()) {
-				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-			}
-
-			return new ResponseEntity<>(goals, HttpStatus.FOUND);
-
-		} catch (Exception e) {
-			System.err.println(e.getMessage());
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+	@GetMapping("{userId}")
+	public Map<String, Object> getAllGoalsByUserId(@AuthenticationPrincipal OAuth2User oAuthUser) {
+		Map<String, Object> user =  oAuthUser.getAttributes();
+		System.out.println("user sub/id: " + user.get("sub"));
+		return user;
+//		try {
+//			List<GoalDto> goals = goalService.findAllGoalsByUserId(userId);
+//
+//			if (goals.isEmpty()) {
+//				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//			}
+//
+//			return new ResponseEntity<>(goals, HttpStatus.FOUND);
+//
+//		} catch (Exception e) {
+//			System.err.println(e.getMessage());
+//			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+//		}
 
 	};
+	
+
 
 	/**
 	 * 
 	 * @param id The id of the goal
 	 * @return a single goal
 	 */
-	@GetMapping("/{id}")
-	public ResponseEntity<GoalDto> getGoalsById(@PathVariable long id) {
+	@GetMapping("{userId}/goal/{goalId}")
+	public ResponseEntity<GoalDto> getGoalsById(@PathVariable long userId, long goalId) {
 		try {
-			Goal goal = goalService.findGoalByGoalId(id);
+			Goal goal = goalService.findGoalByGoalId(goalId);
 
 			if (goal == null) {
 				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -80,7 +83,7 @@ public class GoalController {
 
 	};
 
-	@GetMapping("sortedGoals")
+	@GetMapping("{userid}/sorted")
 	public ResponseEntity<List<GoalDto>> getAllGoalsSorted(@RequestParam(defaultValue = "id, category") String[] sort) {
 		try {
 			List<GoalDto> goalsDto = goalService.getAllGoalsSorted(sort);
@@ -101,7 +104,7 @@ public class GoalController {
 	 * @param goalData The data to create a new goal
 	 * @return The data of the newly created goal
 	 */
-	@PostMapping("/user/{userId}")
+	@PostMapping("{userId}")
 	public ResponseEntity<GoalDto> createGoalByUserId(@RequestBody GoalDto goalData) {
 		System.out.println("user id: " + goalData.getUserId());
 		try {
