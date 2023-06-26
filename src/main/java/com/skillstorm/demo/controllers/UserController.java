@@ -23,21 +23,21 @@ public class UserController {
 
 	@Autowired
 	private OAuth2AuthorizedClientService clientService;
-	
+
 	// Redirects the user to the frontend application (S3 bucket, localhost:5173)
 	// Users should ONLY access the app using this
 	// This is done to get the JSESSIONID cookie established (login with Google)
 	@GetMapping("/signin")
 	public RedirectView redirectView() {
+		System.out.println("sign in redirect");
 		RedirectView redirectView = new RedirectView("http://localhost:5173");
 		return redirectView;
 	}
-	
 
 	@GetMapping("/userinfo")
 	@ResponseBody // Send the data as JSON
 	public Map<String, Object> userInfo(@AuthenticationPrincipal OAuth2User oAuthuser) {
-		
+
 		// Info about the user
 		Map<String, Object> user = oAuthuser.getAttributes();
 		System.out.println(user.get("sub"));

@@ -2,6 +2,7 @@ package com.skillstorm.demo.services;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -32,7 +33,11 @@ public class GoalService {
 	}
 
 	public List<GoalDto> findAllGoalsByUserId(String userId) {
-		return goalRepository.findAllGoalsByUserId(userId).stream().map(g -> g.toDto()).toList();
+//		return goalRepository.findAllGoalsByUserId(userId).stream().map(g -> g.toDto()).toList();
+		return goalRepository.findAllGoalsByUserId(userId)
+					.stream()
+					.map(g -> g.toDto())
+					.collect(Collectors.toList());
 	}
 
 	public Goal findGoalByGoalId(long goalId) {

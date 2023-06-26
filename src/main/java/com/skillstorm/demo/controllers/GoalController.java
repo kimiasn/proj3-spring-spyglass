@@ -40,8 +40,8 @@ public class GoalController {
 //		Map<String, Object> user =  oAuthUser.getAttributes();
 //		System.out.println("user sub/id: " + user.get("sub"));
 //		return user;
-	public ResponseEntity<List<GoalDto>> getAllGoalsByUserId(@AuthenticationPrincipal OAuth2User user) {
-		
+	public ResponseEntity<List<GoalDto>> findAllGoalsByUserId(@AuthenticationPrincipal OAuth2User user) {
+		System.out.println("in goalControler findalluser " + user.getAttributes().get("sub"));
 		try {
 			List<GoalDto> goals = goalService.findAllGoalsByUserId((String) user.getAttributes().get("sub"));
 
@@ -66,7 +66,7 @@ public class GoalController {
 	 * @return a single goal
 	 */
 	@GetMapping("{userId}/goal/{goalId}")
-	public ResponseEntity<GoalDto> getGoalsById(@PathVariable long userId, long goalId) {
+	public ResponseEntity<GoalDto> findGoalById(@PathVariable long userId, long goalId) {
 		try {
 			Goal goal = goalService.findGoalByGoalId(goalId);
 
@@ -84,7 +84,7 @@ public class GoalController {
 	};
 
 	@GetMapping("{userid}/sorted")
-	public ResponseEntity<List<GoalDto>> getAllGoalsSorted(@RequestParam(defaultValue = "id, category") String[] sort) {
+	public ResponseEntity<List<GoalDto>> findAllGoalsSorted(@RequestParam(defaultValue = "id, category") String[] sort) {
 		try {
 			List<GoalDto> goalsDto = goalService.getAllGoalsSorted(sort);
 
@@ -105,7 +105,7 @@ public class GoalController {
 	 * @return The data of the newly created goal
 	 */
 	@PostMapping("{userId}")
-	public ResponseEntity<GoalDto> createGoalByUserId(@RequestBody GoalDto goalData) {
+	public ResponseEntity<GoalDto> createGoal(@RequestBody GoalDto goalData) {
 
 		try {
 
@@ -121,7 +121,7 @@ public class GoalController {
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<GoalDto> updateGoalByGoalId(@RequestBody GoalDto goalData) {
+	public ResponseEntity<GoalDto> updateGoal(@RequestBody GoalDto goalData) {
 		try {
 
 			Goal goal = goalService.findGoalByGoalId(goalData.getId());
@@ -141,7 +141,7 @@ public class GoalController {
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> deleteGoalByGoalId(@PathVariable long id) {
+	public ResponseEntity<Void> deleteGoal(@PathVariable long id) {
 		Goal goal = goalService.findGoalByGoalId(id);
 		System.out.println("goal id to delete: ");
 		if (goal == null) {
