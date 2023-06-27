@@ -63,7 +63,7 @@ public class GoalService {
 
 		List<Goal> goals = goalRepository.findAll(Sort.by(orders));
 
-		return goals.stream().map(g -> g.toDto()).toList();
+		return goals.stream().map(g -> g.toDto()).collect(Collectors.toList());
 
 	}
 
