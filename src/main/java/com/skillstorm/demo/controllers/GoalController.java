@@ -41,15 +41,15 @@ public class GoalController {
 //		System.out.println("user sub/id: " + user.get("sub"));
 //		return user;
 	public ResponseEntity<List<GoalDto>> findAllGoalsByUserId(@AuthenticationPrincipal OAuth2User user) {
-		System.out.println("in goalControler findalluser " + user.getAttributes().get("sub"));
+//		System.out.println("in goalControler findalluser " + user.getAttributes().get("sub"));
 		try {
 			List<GoalDto> goals = goalService.findAllGoalsByUserId((String) user.getAttributes().get("sub"));
 
 			if (goals.isEmpty()) {
-				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 			}
 
-			return new ResponseEntity<>(goals, HttpStatus.FOUND);
+			return new ResponseEntity<>(goals, HttpStatus.OK);
 
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
