@@ -1,6 +1,7 @@
 package com.skillstorm.demo.services;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -22,7 +23,7 @@ public class UserService {
 		return userRepository.findAll()
 				.stream()
 				.map(u -> u.toDto())
-				.toList();
+				.collect(Collectors.toList());
 	}
 	
 	public UserDto findUserById(long id) {
