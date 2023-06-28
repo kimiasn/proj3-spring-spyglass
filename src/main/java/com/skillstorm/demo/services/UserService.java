@@ -28,9 +28,9 @@ public class UserService {
 	
 	public UserDto findUserById(long id) {
 //		System.out.println("find user by id: " + id);
-		return userRepository.findById(id)
-				.orElseThrow()  
-				.toDto();
+		User user = userRepository.findById(id).orElseThrow();
+				
+		return user.toDto();
 	}
 	
 	/**
