@@ -2,6 +2,8 @@ package com.skillstorm.demo.config;
 
 import java.util.Arrays;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -16,10 +18,20 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http.authorizeRequests()
+//			.antMatchers(HttpMethod.POST, "/logout").permitAll()
 			  .anyRequest().authenticated()
 			  .and()
 			  .csrf().disable()
-			  .oauth2Login(); 
+			  .oauth2Login()
+			  .and()
+			  .logout(logout -> logout.permitAll()
+
+	                    .logoutSuccessHandler((request, response, authentication) -> {
+
+	                        response.setStatus(HttpServletResponse.SC_OK);
+
+	                    }));
+			  
 		
 		// Redirect URI
 		// http://localhost:8080/login/oauth2/code/google
