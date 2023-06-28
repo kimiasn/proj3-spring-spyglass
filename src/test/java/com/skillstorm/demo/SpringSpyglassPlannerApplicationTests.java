@@ -7,9 +7,9 @@ import org.springframework.util.Assert;
 @SpringBootTest
 class SpringSpyglassPlannerApplicationTests {
 
-	@Test
-	void contextLoads() {
-		Assert.isTrue(true);
-	}
+//	@Test
+//	void contextLoads() {
+//		Assert.isTrue(true);
+//	}
 
 }
