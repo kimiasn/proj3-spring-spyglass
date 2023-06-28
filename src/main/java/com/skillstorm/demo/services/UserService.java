@@ -1,6 +1,7 @@
 package com.skillstorm.demo.services;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
@@ -28,8 +29,7 @@ public class UserService {
 	
 	public UserDto findUserById(long id) {
 //		System.out.println("find user by id: " + id);
-		User user = userRepository.findById(id).orElseThrow();
-				
+		User user = userRepository.findById(id).orElseThrow(NoSuchElementException::new);
 		return user.toDto();
 	}
 	

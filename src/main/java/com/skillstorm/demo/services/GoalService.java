@@ -2,6 +2,7 @@ package com.skillstorm.demo.services;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
@@ -41,8 +42,8 @@ public class GoalService {
 	}
 
 	public Goal findGoalByGoalId(long goalId) {
-		Goal goal = goalRepository.findById(goalId).orElseThrow();
-		return goal;
+		
+		return goalRepository.findById(goalId).orElseThrow(NoSuchElementException::new);
 	}
 
 	public List<GoalDto> getAllGoalsSorted(String[] sort) {
