@@ -65,20 +65,20 @@ public class GoalController {
 	 * @param id The id of the goal
 	 * @return a single goal
 	 */
-	@GetMapping("{userId}/goal/{goalId}")
-	public ResponseEntity<GoalDto> findGoalById(@PathVariable long userId, long goalId) {
+	@GetMapping("goal/{goalId}")
+	public ResponseEntity<GoalDto> findGoalById(@PathVariable long goalId) {
 		try {
 			Goal goal = goalService.findGoalByGoalId(goalId);
 
 			if (goal == null) {
-				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 			}
 
-			return new ResponseEntity<>(goal.toDto(), HttpStatus.FOUND);
+			return new ResponseEntity<>(goal.toDto(), HttpStatus.OK);
 
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
 	};
@@ -104,29 +104,29 @@ public class GoalController {
 	 * @param goalData The data to create a new goal
 	 * @return The data of the newly created goal
 	 */
-	@PostMapping("{userId}")
+	@PostMapping()
 	public ResponseEntity<GoalDto> createGoal(@RequestBody GoalDto goalData) {
 
 		try {
-
+System.out.println("reached createGoal");
 			GoalDto goalDto = goalService.createGoal(goalData);
 			return new ResponseEntity<>(goalDto, HttpStatus.CREATED);
 
 		} catch (Exception e) {
 
 			System.err.println(e.getMessage());
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
 	}
 
-	@PutMapping("/{id}")
-	public ResponseEntity<GoalDto> updateGoal(@RequestBody GoalDto goalData) {
+	@PutMapping("goal/{id}")
+	public ResponseEntity<GoalDto> updateGoal(@PathVariable long id, @RequestBody GoalDto goalData) {
 		try {
 
-			Goal goal = goalService.findGoalByGoalId(goalData.getId());
+			Goal goal = goalService.findGoalByGoalId(id);
 			if (goal == null) {
-				return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+				return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
 			}
 			GoalDto goalDto = goalService.updateGoal(goalData);
 
@@ -135,17 +135,17 @@ public class GoalController {
 		} catch (Exception e) {
 
 			System.err.println(e.getMessage());
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
 	}
 
-	@DeleteMapping("/{id}")
+	@DeleteMapping("goal/{id}")
 	public ResponseEntity<Void> deleteGoal(@PathVariable long id) {
 		Goal goal = goalService.findGoalByGoalId(id);
 		System.out.println("goal id to delete: ");
 		if (goal == null) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		}
 		goalService.deleteGoal(goal);
 		return new ResponseEntity<>(HttpStatus.OK);
