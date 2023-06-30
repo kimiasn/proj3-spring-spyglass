@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,9 +25,12 @@ import org.springframework.web.servlet.view.RedirectView;
 
 @Controller
 //            allows cookies to send,
-@CrossOrigin(allowCredentials = "true", originPatterns = "http://localhost:5173")
+@CrossOrigin(allowCredentials = "true", originPatterns = {"http://localhost:5173", "http://sylvia-spyglass2.s3-website-us-east-1.amazonaws.com"})
 public class UserController {
-
+	
+	@Value("${frontend.url}")
+	private String url;
+	
 	@Autowired
 	private OAuth2AuthorizedClientService clientService;
 
@@ -36,7 +40,7 @@ public class UserController {
 	@GetMapping("/signin")
 	public RedirectView redirectView() {
 //		System.out.println("sign in redirect");
-		RedirectView redirectView = new RedirectView("http://localhost:5173");
+		RedirectView redirectView = new RedirectView(url);
 		return redirectView;
 	}
 

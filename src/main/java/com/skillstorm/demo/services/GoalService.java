@@ -16,6 +16,8 @@ import com.skillstorm.demo.dtos.GoalDto;
 import com.skillstorm.demo.models.Goal;
 import com.skillstorm.demo.repositories.GoalRepository;
 
+import io.opentelemetry.instrumentation.annotations.WithSpan;
+
 @Service
 @Transactional
 public class GoalService {
@@ -33,6 +35,7 @@ public class GoalService {
 		return Sort.Direction.ASC;
 	}
 
+	@WithSpan
 	public List<GoalDto> findAllGoalsByUserId(String userId) {
 //		return goalRepository.findAllGoalsByUserId(userId).stream().map(g -> g.toDto()).toList();
 		return goalRepository.findAllGoalsByUserId(userId)
